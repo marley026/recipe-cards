@@ -1,0 +1,285 @@
+@font-face {
+    font-family: OpenSans;
+    font-weight: 400;
+    src: url(OpenSans.ttf)
+}
+
+/* Size for brand */
+nav .navbar-brand {
+    font-size: xx-large;
+    font-family: serif;
+}
+
+.navbar-custom {
+    background-color: #171717;
+}
+
+.navbar-brand {
+    color: white;
+}
+
+.navbar-custom a {
+    color: white;
+}
+
+.navbar-custom a:hover {
+    color: #BEBEBE;
+}
+
+.footer-text {
+    font-family: serif;
+    font-size: 35pt;
+}
+
+#navbar ul li {
+    color: white;
+}
+
+#navbar ul li ul {
+    visibility: hidden;
+    opacity: 0;
+    display: none;
+    position: absolute;
+    right: 0px;
+    z-index: 200;
+}
+
+#navbar ul li ul li {
+
+    background-color: #171717;
+    list-style-type: none
+}
+
+#navbar ul li:hover>ul {
+    visibility: visible;
+    opacity: 1;
+    display: block;
+}
+
+.forms {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 150px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.form-title {
+    font-family: serif;
+    font-weight: bold;
+    font-size: 15pt;
+}
+
+.logo {
+    font-family: serif;
+}
+
+.subtitle {
+    font-size: 14pt;
+    font-family: "OpenSans";
+}
+
+.main {
+    font-family: "OpenSans";
+    font-weight: 600;
+    font-size: 15pt;
+    margin-top: 50px;
+}
+
+
+/*
+
+.recipe-content li {
+    margin: 10px 0;
+}
+*/
+.site-link {
+    color: gray;
+}
+
+.site-link:hover {
+    color: #444444;
+}
+
+.stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: auto;
+    content: "";
+    background-color: rgba(0,0,0,0);
+}
+
+.navbar-custom {
+    background-color: #171717;
+}
+
+.navbar-brand {
+    color: white;
+}
+
+.navbar-custom a {
+    color: white;
+}
+
+.navbar-custom a:hover {
+    color: #BEBEBE;
+}
+
+.card:hover {
+    background-color: #f6f6f6;
+}
+
+.card button {
+    z-index: 200;
+    position: relative;
+}
+
+.delete-button:hover {
+    background-color: red;
+    border-color: red;
+    color: white;
+}
+
+.source-link {
+    z-index: 200;
+    position: relative;
+}
+
+.source-link:hover {
+    color: purple;
+}
+
+
+[contenteditable="true"]:focus {
+    outline: none;
+}
+
+.button-css {
+    background-color: #23272B;
+    color: white;
+}
+
+.button-css:hover {
+    background-color: #343A40;
+    color: white;
+}
+
+.delete-button {
+    background-color: #23272B;
+    color: white;
+}
+
+.soft-link {
+    color: black;
+}
+
+.muted {
+    color: #6C757E;
+}
+
+/* Infinite Logo Scroll */
+/* https://ryanmulligan.dev/blog/css-marquee/ */
+
+.site-loop {
+    --gap: 30px;
+    display: flex;
+    gap: var(--gap);
+    position: relative;
+    user-select: none;
+    height: 200px;
+    align-items: center;
+}
+
+.loop-container {
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-width: 100%;
+    gap: var(--gap);
+}
+
+.image-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 300px;
+    height: 100%;
+}
+
+.image-container img,
+.image-container svg {
+    width: 300px;
+    max-height: 200px;
+}
+
+@keyframes scroll {
+    from {
+    transform: translateX(-2%);
+    }
+    to {
+    transform: translateX(calc(-102% - var(--gap)));
+    }
+}
+
+.scroll {
+    animation: scroll 35s linear infinite;
+}
+
+.site-container img,
+.site-container svg {
+    width: 300px;
+    max-height: 200px;
+}
+
+#site-list {
+    text-align: center;
+    list-style-position: inside;
+    list-style-type: none;
+}
+
+#site-list li {
+    display: inline-block;
+    padding: 20px;
+}
+
+.section-title {
+    list-style: none;
+    font-family: serif;
+    font-size: 20px;
+}
+
+.ingredient-section {
+    list-style: disc;
+}
+
+
+.searchBox {
+    display: flex;
+    justify-content: flex-start;
+    background-color: #f6f6f6;
+    width: 300px;
+    padding: 10px;
+    border-radius: 50px;
+    transition: box-shadow 0.25s;
+    margin: auto;
+}
+
+.searchBox:focus-within {
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.75);
+}
+
+.searchBox input {
+    margin-left: 8px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    width: 240px;
+}
+

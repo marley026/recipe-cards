@@ -1,0 +1,55 @@
+body {
+    background-color: #212121;
+    color: white;
+}
+
+#image-check {
+    background-color: #4f4f4f;
+}
+
+#image-check::after {
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><path fill="%23ddd" d="M9,.09C4.08.09.09,4.08.09,9s3.99,8.91,8.91,8.91,8.91-3.99,8.91-8.91S13.92.09,9,.09ZM4.44,4.44c.29-.29.64-.44,1.06-.44s.77.15,1.06.44.44.64.44,1.06-.15.77-.44,1.06-.64.44-1.06.44-.77-.15-1.06-.44-.44-.64-.44-1.06.15-.77.44-1.06ZM3,14l3-4,2.25,3,3-4,3.75,5H3Z"/></svg>') no-repeat center/contain;
+}
+
+#print {
+    background-color: #212121;
+}
+
+#print-button {
+    color: #eee;
+}
+
+#print:hover {
+    background-color: #2D2D2D;
+}
+
+.recipe-meta {
+    color: #ccc;
+}
+
+.ingredients-sticky {
+    background-color: #333;
+}
+
+.scroll-fade {
+    background: linear-gradient(to bottom, transparent, #333);
+}
+
+.muted, .site-link {
+    color: #bebebe;
+}
+
+.site-link:hover {
+    color: white;
+}
+
+.delete-button {
+    background-color: #353535;
+    color: white;
+}
+
+@media (max-width: 990px) {
+    .ingredients-sticky {
+        background: transparent;
+    }
+}

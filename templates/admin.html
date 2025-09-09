@@ -1,0 +1,136 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Admin
+{% endblock %}
+
+{% block main %}
+    <style>
+        .table-header {
+            font-family: serif;
+            font-size: 20px;
+        }
+    </style>
+
+    {% if requests %}
+        <h1 style="text-align: center; margin-bottom: 20px; font-family: serif;">Requests</h1>
+        <table id="suggest-table" class="table-class table table-striped">
+            <thead class=".thead-light">
+                <tr>
+                    <th class="table-header">User</th>
+                    <th class="table-header">Url</th>
+                    <th class="table-header">Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for request in requests %}
+                    <tr>
+                        <td>{{ request.user_id }}</td>
+                        <td>{{ request.site }}</td>
+                        <td>
+                            <form action="/remove-request" method="post">
+                                <input name="site" type="hidden" value="{{ request.site }}">
+                                <input name="user_id" type="hidden" value="{{ request.user_id }}">
+                                <button class="btn delete-button" type="submit">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <h1 class="logo" style="margin-bottom: 50px;">No Requests</h1>
+    {% endif %}
+
+    <form action="/refresh-sessions" method="post" style="margin-bottom: 20px; margin-top: 50px;">
+        <button class="btn delete-button" type="submit">Remove Expired Sessions</button>
+    </form>
+
+    <table id="session-table" class="table-class table table-striped" style="margin-bottom: 50px;">
+        <thead class=".thead-light">
+            <tr>
+                <th class="table-header">Session ID</th>
+                <th class="table-header">User ID</th>
+                <th class="table-header">Expiration</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for session in sessions %}
+                <tr>
+                    <td>{{ session.session_id }}</td>
+                    <td>{{ session.user_id }}</td>
+                    <td>{{ session.expiration }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button id="user-table-button" class="btn button-css">Expand User Table</button>
+
+    <div id="user-table" style="display: none;">
+        <table class="table-class table table-striped">
+            <thead class=".thead-light">
+                <tr>
+                    <th class="table-header">ID</th>
+                    <th class="table-header">User</th>
+                    <th class="table-header">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                    {% if user.id != 1 %}
+                        <tr>
+                            <td>{{ user.id }}</td>
+                            <td>{{ user.username }}</td>
+                            {% if user.id != 10 %}
+                                <td>
+                                    <form onsubmit="remove_user(event)">
+                                        <input name="id" type="hidden" value="{{ user.id }}">
+                                        <input name="user" type="hidden" value="{{ user.username }}">
+                                        <button class="btn delete-button" type="submit">REMOVE</button>
+                                    </form>
+                                </td>
+                            {% else %}
+                                <td> </td>
+                            {% endif %}
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        var userTableButton = document.getElementById('user-table-button');
+        var userTable = document.getElementById('user-table');
+
+        userTableButton.addEventListener("click", () => {
+            if (userTable.style.display == 'none'){
+                userTable.style.display = 'block';
+            } else {
+                userTable.style.display = 'none';
+            }
+        });
+
+        function remove_user(event) {
+            event.preventDefault();
+
+            if (confirm("Are you sure you want to delete user: '" + event.currentTarget.querySelector('[name="user"]').value + "'?")) {
+                user_id = event.currentTarget.querySelector('[name="id"]').value;
+
+                fetch("/remove-user", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ user_id: user_id })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.href = "/";
+                    } else {
+                        alert("Failed to delete user");
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}

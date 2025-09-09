@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+
+        <!-- http://getbootstrap.com/docs/5.3/ -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+        {% block links %}{% endblock %}
+
+        <link href="/static/logo48.png" rel="icon">
+        <link id="theme" href="/static/styles.css" rel="stylesheet">
+        <link id="customDarkCSS" href="#" rel="stylesheet" disabled>
+
+        <title>{% block title %}{% endblock %}</title>
+
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-dark navbar-custom navbar-expand-md">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Recipe Cards</a>
+                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbar">
+                    {% if request.cookies.get('session_id') %}
+                        <ul class="navbar-nav me-auto mt-2">
+                            <li class="nav-item"><a class="nav-link" href="/cards">Saved Cards</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/add-card-by-url">Add Card</a></li>
+                        </ul>
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <li class="nav-item" id="nav-dropdown">User
+                                <ul>
+                                    <li class="nav-item"><a class="nav-link" href="#"></a></li>
+                                    <li class="nav-item"><a class="nav-link" href="javascript:changeTheme()">Change Theme</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item" id="mobile-nav-settings" style="display: none;"><a class="nav-link" href="/settings">Settings</a></li>
+                            <li class="nav-item" id="mobile-nav-theme" style="display: none;"><a class="nav-link" href="javascript:changeTheme()">Change Theme</a></li>
+                            <li class="nav-item" id="mobile-nav-logout" style="display: none;"><a class="nav-link" href="/logout">Log Out</a></li>
+                        </ul>
+                    {% else %}
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        {% if get_flashed_messages() %}
+            <header>
+                <div class="alert alert-dark mb-0 text-center" role="alert">
+                    {{ get_flashed_messages() | join(" ") }}
+                </div>
+            </header>
+        {% endif %}
+
+        {% block before_main %}{% endblock %}
+
+        <main class="container py-5 text-center">
+            {% block main %}{% endblock %}
+        </main>
+
+        <footer class="mb-5">
+            <div style="text-align: center;">
+                <img id="footer-logo" src="/static/logo-black.svg" alt="Recipe Cards logo" style="height: 100px;">
+                <p class="footer-text">Recipe Cards</p>
+            </div>
+            {% block in_footer %}{% endblock %}
+        </footer>
+
+
+    <script>
+        var CSSLink = document.getElementById('theme');
+        var footerLogo = document.getElementById('footer-logo');
+        var themePreference = localStorage.getItem('themePreference');
+        var tables = document.querySelectorAll('.table-class');
+        {% if custom_dark_css is defined %}
+        const customDarkLink = document.querySelector('#customDarkCSS');
+        customDarkLink.href = '{{ custom_dark_css }}';
+        // Set theme to browser preference
+        if (!themePreference) {
+            themePreference = 'none'
+        }
+        if (themePreference == 'dark' || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && themePreference == 'none') {
+            customDarkLink.disabled = false;
+            footerLogo.setAttribute('src', '/static/logo-white.svg');
+            tables.forEach(function(table) {
+                table.classList.add('table-dark');
+            });
+        }
+        else {
+            customDarkLink.disabled = true;
+            footerLogo.setAttribute('src', '/static/logo-black.svg');
+        }
+
+        // Toggle theme
+        function changeTheme() {
+            if (customDarkLink.disabled) {
+                customDarkLink.disabled = false;
+                footerLogo.setAttribute('src', '/static/logo-white.svg');
+                localStorage.setItem('themePreference', 'dark');
+                tables.forEach(function(table) {
+                    table.classList.add('table-dark');
+                });
+            } else {
+                customDarkLink.disabled = true;
+                footerLogo.setAttribute('src', '/static/logo-black.svg');
+                localStorage.setItem('themePreference', 'light');
+                tables.forEach(function(table) {
+                    table.classList.remove('table-dark');
+                });
+            }
+        }
+        {% else %}
+        // Set theme to browser preference
+        if (!themePreference) {
+            themePreference = 'none'
+        }
+        if (themePreference == 'dark' || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && themePreference == 'none') {
+            CSSLink.setAttribute('href', '/static/dark.css');
+            footerLogo.setAttribute('src', '/static/logo-white.svg');
+            tables.forEach(function(table) {
+                table.classList.add('table-dark');
+            });
+        }
+        else {
+            CSSLink.setAttribute('href', '/static/styles.css');
+            footerLogo.setAttribute('src', '/static/logo-black.svg');
+        }
+
+        // Toggle theme
+        function changeTheme() {
+            if (CSSLink.getAttribute('href') === '/static/styles.css') {
+                CSSLink.setAttribute('href', '/static/dark.css');
+                footerLogo.setAttribute('src', '/static/logo-white.svg');
+                localStorage.setItem('themePreference', 'dark');
+                tables.forEach(function(table) {
+                    table.classList.add('table-dark');
+                });
+            } else {
+                CSSLink.setAttribute('href', '/static/styles.css');
+                footerLogo.setAttribute('src', '/static/logo-black.svg');
+                localStorage.setItem('themePreference', 'light');
+                tables.forEach(function(table) {
+                    table.classList.remove('table-dark');
+                });
+            }
+        }
+        {% endif %};
+
+
+        
+
+        // If mobile -> show hidden nav elements
+        if (window.innerWidth <= 767) {
+            document.getElementById('mobile-nav-theme').style.display = 'block';
+            document.getElementById('mobile-nav-settings').style.display = 'block';
+            document.getElementById('mobile-nav-logout').style.display = 'block';
+            document.getElementById('nav-dropdown').style.display = 'none';
+        }
+    </script>
+
+    </body>
+
+</html>

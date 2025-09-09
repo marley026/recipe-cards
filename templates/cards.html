@@ -1,0 +1,49 @@
+{% extends "layout.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=search" />
+<script src="https://cdn.jsdelivr.net/npm/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/masonry-layout@4.2.2/dist/masonry.pkgd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.6.2/dist/fuse.min.js"></script>
+<script src="/static/cards.js"></script>
+{% endblock %}
+
+{% block title %}
+    Cards
+{% endblock %}
+
+{% block main %}
+    {% if data==False %}
+    <p style="font-family: serif; font-size: 20pt;">You have no recipes saved.</p>
+    <p>Go to "<a href="/add-card-by-url" class="soft-link">Add Card</a>" and paste a link to a recipe you want to save. <br> Or manually input a recipe <a href="/add-card" class="soft-link">here</a></p>
+    {% else %}
+    <!-- Search -->
+    <div id="search" class="searchBox">
+        <span class="material-symbols-outlined">search</span>
+        <input autocomplete="off" type="text" id="search-bar" placeholder="Search recipes...">
+    </div>
+
+    <!-- Cards -->
+    <div class="container" style="margin-top: 20px;">
+        <div id="card-container" class="row g-3" data-masonry='{"percentPosition": true }'>
+            <div class="col-12 col-md-6 col-lg-4 col-xl-3">
+                <div class="card card-custom">
+                    <img src="#" class="card-img-top" alt="">
+                    <div class="card-body">
+                        <h5 class="card-title">RECIPE NAME</h5>
+                        <p class="card-text">Source: <a class="source-link" href="#">RECIPE SOURCE</a></p>
+                        <form onsubmit="remove_card(event)">
+                            <input type="hidden" name="recipe_route" value="###ROUTE###">
+                            <button type="submit" class="btn delete-button card-btn">Delete</button>
+                        </form>
+                        <a href="###RECIPE ROUTE###" class="stretched-link"></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="data">{{ recipes | safe }}</script>
+    {% endif %}
+    
+{% endblock %}

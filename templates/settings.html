@@ -1,0 +1,61 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Settings
+{% endblock %}
+
+{% block main %}
+    <div class="forms">
+        <form action="/update_password" method="post">
+            <p class="form-title">Change Password</p>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" name="password" placeholder="Old Password" type="password">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" name="new_password" placeholder="New Password" type="password">
+            </div>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" name="confirmation" placeholder="Confirm Password" type="password">
+            </div>
+            <button class="btn button-css" type="submit">Update Password</button>
+        </form>
+
+        <form action="/update_username" method="post">
+            <p class="form-title">Change Username</p>
+            <div class="mb-3">
+                <input class="form-control mx-auto w-auto" name="password" placeholder="Password" type="password">
+            </div>
+            <div class="mb-3">
+                <input autocomplete="off" class="form-control mx-auto w-auto" name="new_username" placeholder="New Username" type="text">
+            </div>
+            <button class="btn button-css" type="submit">Update Username</button>
+        </form>
+    </div>
+    <div style="margin-top: 70px;">
+        <button onclick="delete_account()" class="btn delete-button" type="submit">DELETE ACCOUNT</button>
+    </div>
+    <script>
+        function delete_account() {
+            var password = prompt("Are you sure you want to DELETE your account? \nThis action CANNOT be undone! \n\nPlease enter your password to confirm deletion:");
+
+            // Check if the user entered a password
+            if (password !== null) {
+                // Send a POST request with the password
+                fetch("/delete_account", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({ password: password })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Account deleted successfully
+                        window.location.href = "/";
+                    } else {
+                        // Error handling
+                        alert("Failed to delete account");
+                    }
+                });
+            }
+        }
+    </script>
+{% endblock %}

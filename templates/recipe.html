@@ -1,0 +1,170 @@
+{% set custom_dark_css = "/static/dark-recipe.css" %}
+{% extends "layout.html" %}
+
+{% block links %}
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black" rel="stylesheet">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=print" />
+<link href="/static/recipe.css" rel="stylesheet">
+
+<link href="/static/print.css" rel="stylesheet">
+<script src="/static/recipe.js"></script>
+{% endblock %}
+
+{% block title %}
+    Recipe
+{% endblock %}
+
+
+
+{% block before_main %}
+<div id="settings-bar">
+    <div id="switch" style="display: none;">
+        <div id="image-toggle">
+            <input id="image-check" class="image-check" type="checkbox" role="switch" checked="">
+        </div>
+    </div>
+    
+    <button id="print">
+        <span id="print-button" class="material-symbols-outlined">print</span>
+    </button>
+</div>
+{% endblock %}
+
+
+
+{% block main %}
+<!-- Title & Meta -->
+<div class="recipe-top">
+    <h1 id="title" class="recipe-title">Title</h1>
+    <div id="image-div">
+        <img class="recipe-image" src="#" alt="Title"/>
+    </div>
+    <!-- <div class="recipe-meta">
+        <span><strong>Author:</strong> author</span>
+        <span><strong>Yield:</strong> yield</span>
+        <span id="times">
+            <strong>Total Time:</strong> 1 hour
+            <span id="time-dropdown" class="arrow down"></span>
+            <ul class="additional-time">
+                <li><strong>Prep Time:</strong> 30 min</li>
+                <li><strong>Cook Time:</strong> 30 min</li>
+            </ul>
+        </span>
+        <p class="recipe-desc">description</p>
+    </div> -->
+</div>
+
+<!-- Main -->
+<div class="recipe-body">
+    <!-- Ingredients (left) -->
+    <div class="ingredients-sticky">
+        <div class="recipe-ingredients">
+            <h2 class="recipe-header">Ingredients</h2>
+            <ul id ="ingredients"></ul>
+        </div>
+    </div>
+
+    <!-- Directions (right) -->
+    <div class="recipe-directions">
+        <h2 class="recipe-header">Directions</h2>
+        <ol id="directions"></ol>
+    </div>
+</div>
+<p class="muted">Source: <a id="source" class="site-link" href="#">Source</a></p>
+
+
+<!-- Nutrition Info -->
+<!-- <div id="nutrition-label">
+    <div class="nf-title">Nutrition Facts</div>
+    <div class="nf-line">
+        <div id="nf-serving" class="nf-serving"></div>
+    </div>
+    <div class="nf-bar2"></div>
+    <div class="nf-amount-per-serving">Amount Per Serving</div>
+    <div class="nf-calories">
+        <span>Calories</span>
+        <span id="nf-calories" class="nf-pr"></span>
+    </div>
+    <div class="nf-bar1"></div>
+    <div class="nf-line nf-text-right">
+        <span class="nf-highlight nf-percent-dv">% Daily Value*</span>
+    </div>
+    <div class="nf-line">
+        <span class="nf-highlight">Total Fat</span>
+        <span id="nf-fatContent">11g</span>
+        <span class="nf-highlight nf-pr">14%</span>
+    </div>
+    <div class="nf-line nf-indent">
+        <span>Saturated Fat</span>
+        <span id="nf-saturatedFatContent"></span>
+    </div>
+    <div class="nf-line nf-indent">
+        <span><em>Trans</em> Fat</span>
+        <span id="nf-transFatContent"></span>
+    </div>
+    <div class="nf-line">
+        <span class="nf-highlight">Cholesterol</span>
+        <span id="nf-cholesterolContent"></span>
+    </div>
+    <div class="nf-line">
+        <span class="nf-highlight">Sodium</span>
+        <span id="nf-sodiumContent"></span>
+    </div>
+    <div class="nf-line">
+        <span class="nf-highlight">Total Carbohydrates</span>
+        <span id="nf-carbohydrateContent"></span>
+    </div>
+    <div class="nf-line nf-indent">
+        <span>Dietary Fiber</span>
+        <span id="nf-fiberContent"></span>
+    </div>
+    <div class="nf-line nf-indent">
+        <span>Sugars</span>
+        <span id="nf-sugarContent"></span>
+    </div>
+    <div class="nf-line">
+        <span class="nf-highlight">Protein</span>
+        <span id="nf-proteinContent"></span>
+    </div>
+    <div class="nf-bar2"></div>
+    <div>
+        <div>
+            <span>Vitamin D</span>
+            <span id="nf-vitaminDContent"></span>
+        </div>
+        <div class="nf-line">
+            <span>Calcium</span>
+            <span id="nf-calciumContent"></span>
+        </div>
+        <div class="nf-line">
+            <span>Iron</span>
+            <span id="nf-ironContent"></span>
+        </div>
+        <div class="nf-line">
+            <span>Potassium</span>
+            <span id="nf-potassiumContent"></span>
+        </div>
+    </div>
+    <div class="nf-bar2"></div>
+    <div>
+        <span class="nf-highlight">Caffeine</span>
+        <span>0mg</span>
+    </div>
+    <div class="nf-bar1"></div>
+    <div>
+        <div class="nf-footnote">
+            <span>The % Daily Value (DV) tells you how much a nutrient in a serving of food contributes to a daily diet. 2000 calories a day is used for general nutrition advice.</span>
+        </div>
+    </div>
+</div>
+<p class="disclaimer"><span>Powered by Nutritionix</span><br>Data processed by AI and may not be accurate</p> -->
+
+
+<script type="application/ld+json" id="recipe">{{ recipeJSON | safe }}</script>
+{% endblock %}
+
+{% block in_footer %}
+<div class="del-div">
+    <button class="btn delete-button" id="delete-button">Delete Recipe</button>
+</div>
+{% endblock %}

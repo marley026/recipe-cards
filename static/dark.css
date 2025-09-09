@@ -1,0 +1,224 @@
+@font-face {
+    font-family: OpenSans;
+    font-weight: 400;
+    src: url(OpenSans.ttf)
+}
+
+html, body {
+    overflow-x: hidden;
+}
+
+body {
+    background-color: #212121;
+    color: white;
+}
+
+/* Size for brand */
+nav .navbar-brand {
+    font-size: xx-large;
+    font-family: serif;
+}
+
+.navbar-custom {
+    background-color: #171717;
+}
+
+.navbar-brand {
+    color: white;
+}
+
+.navbar-custom a {
+    color: white;
+}
+
+.navbar-custom a:hover {
+    color: #BEBEBE;
+}
+
+.footer-text {
+    font-family: serif;
+    font-size: 35pt;
+    color: white;
+}
+
+#navbar ul li {
+    color: white;
+}
+
+#navbar ul li ul {
+    visibility: hidden;
+    opacity: 0;
+    display: none;
+    position: absolute;
+    right: 0px;
+    z-index: 200;
+}
+
+#navbar ul li ul li {
+
+    background-color: #171717;
+    list-style-type: none
+}
+
+#navbar ul li:hover>ul {
+    visibility: visible;
+    opacity: 1;
+    display: block;
+}
+
+.card-custom {
+    background-color: #1C1C1C;
+    color: white;
+}
+
+.card-custom :hover {
+    background-color: #191919;
+    border: none;
+}
+
+.card-custom a {
+    color: #3f84e4;
+}
+
+.card-custom a:hover {
+    color: #6D73E4;
+}
+
+.forms {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 150px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+
+.form-title {
+    font-family: serif;
+    font-weight: bold;
+    font-size: 15pt;
+}
+
+.logo {
+    font-family: serif;
+}
+
+.subtitle {
+    font-size: 14pt;
+    font-family: "OpenSans";
+}
+
+.main {
+    font-family: "OpenSans";
+    font-weight: 600;
+    font-size: 15pt;
+    margin-top: 50px;
+}
+
+.stretched-link::after {
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    pointer-events: auto;
+    content: "";
+    background-color: rgba(0,0,0,0);
+}
+
+.card button {
+    z-index: 200;
+    position: relative;
+}
+
+.delete-button:hover {
+    background-color: red;
+    border-color: red;
+}
+
+.source-link {
+    z-index: 200;
+    position: relative;
+}
+
+.muted {
+    color: #BEBEBE;
+}
+
+.button-css {
+    background-color: #353535;
+    color: white;
+}
+
+.button-css:hover {
+    background-color: #404040;
+}
+
+.delete-button {
+    background-color: #353535;
+    color: white;
+}
+
+.soft-link {
+    color: white;
+}
+
+input[type="text"],
+input[type="password"] {
+    background-color: #333;
+    color: #fff;
+    border-color: #666;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    outline: none !important;
+    background-color: #333;
+    color: #fff;
+    border-color: #666;
+}
+
+input[type="text"]::placeholder,
+input[type="password"]::placeholder {
+    color: #fff;
+}
+
+.form-control:focus {
+    box-shadow: none;
+}
+
+textarea.textarea-css {
+    background-color: #333;
+    color: #fff;
+    border-color: #666;
+}
+
+textarea.textarea-css:focus {
+    background-color: #333;
+    color: #fff;
+    border-color: #666;
+}
+
+#search {
+    background-color: #333;
+    display: flex;
+    justify-content: flex-start;
+    width: 300px;
+    padding: 10px;
+    border-radius: 50px;
+    transition: box-shadow 0.25s;
+    margin: auto;
+}
+
+#search:focus-within {
+    box-shadow: 0 0 2px rgba(255, 255, 255, 0.75);
+}
+
+.searchBox input {
+    margin-left: 8px;
+    background-color: transparent;
+    outline: none;
+    border: none;
+    width: 240px;
+}

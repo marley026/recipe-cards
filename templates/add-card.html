@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+    <head>
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="initial-scale=1, width=device-width">
+
+        <!-- http://getbootstrap.com/docs/5.3/ -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+        <link href="/static/logo48.png" rel="icon">
+        <link id="theme" href="/static/styles.css" rel="stylesheet">
+
+        <title>Add Card</title>
+
+    </head>
+
+    <body>
+
+        <nav class="navbar navbar-dark navbar-custom navbar-expand-md">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">Recipe Cards</a>
+                <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbar">
+                    {% if request.cookies.get('session_id') %}
+                        <ul class="navbar-nav me-auto mt-2">
+                            <li class="nav-item"><a class="nav-link" href="/cards">Saved Cards</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/add-card-by-url">Add Card</a></li>
+                        </ul>
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <li class="nav-item" id="nav-dropdown">User
+                                <ul>
+                                    <li class="nav-item"><a class="nav-link" href="#"></a></li>
+                                    <li class="nav-item"><a class="nav-link" href="javascript:changeTheme()">Change Theme</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/settings">Settings</a></li>
+                                    <li class="nav-item"><a class="nav-link" href="/logout">Log Out</a></li>
+                                </ul>
+                            </li>
+                            <li class="nav-item" id="mobile-nav-settings" style="display: none;"><a class="nav-link" href="/settings">Settings</a></li>
+                            <li class="nav-item" id="mobile-nav-theme" style="display: none;"><a class="nav-link" href="javascript:changeTheme()">Change Theme</a></li>
+                            <li class="nav-item" id="mobile-nav-logout" style="display: none;"><a class="nav-link" href="/logout">Log Out</a></li>
+                        </ul>
+                    {% else %}
+                        <ul class="navbar-nav ms-auto mt-2">
+                            <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
+                            <li class="nav-item"><a class="nav-link" href="/login">Log In</a></li>
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        </nav>
+
+        {% if get_flashed_messages() %}
+            <header>
+                <div class="alert alert-primary mb-0 text-center" role="alert">
+                    {{ get_flashed_messages() | join(" ") }}
+                </div>
+            </header>
+        {% endif %}
+
+        <main id="main" class="container py-5">
+            <form action="/add-card-by-url" style="float: right;">
+                <button class="btn button-css" type="submit">Add Card By URL</button>
+            </form>
+            <h1 style="text-align: center; margin-bottom: 20px; font-family: serif;">Add Recipe Card</h1>
+            <form action="/add-card" method="post" enctype="multipart/form-data">
+                <div class="mb-3" style="width: 100%; display: flex;">
+                    <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="title" placeholder="Title" type="text" style="flex: 1;">
+                </div>
+                <div style="margin-top: 40px;">
+                    <h2 style="font-family: serif; font-size: x-large;">Ingredients:</h2>
+                    <p class="muted">Please enter ingredients with a new line between each, or add your own delimiter, like a "," or ";".<br>Please make sure your ingredient text does not include the delimiter you selected.</p>
+                    <textarea name="ingredients" class="form-control textarea-css" rows="4"></textarea>
+                </div>
+                <div class="mb-3" style="width: 100%; display: flex;">
+                    <input autocomplete="off" class="form-control mx-auto w-auto" name="iDelimiter" placeholder="Delimiter (if not seperate lines)" type="text" style="flex: 1;">
+                </div>
+                <div style="margin-top: 40px;">
+                    <h2 style="font-family: serif; font-size: x-large;">Directions:</h2>
+                    <p class="muted">Please enter directions without the steps numbered and with a new line between step, or add your own delimiter, like a "," or ";".<br>Please make sure your directions text does not include the delimiter you selected.</p>
+                    <textarea name="directions" class="form-control textarea-css" rows="8"></textarea>
+                </div>
+                <div class="mb-3" style="width: 100%; display: flex;">
+                    <input autocomplete="off" class="form-control mx-auto w-auto" name="dDelimiter" placeholder="Delimiter (if not seperate lines)" type="text" style="flex: 1;">
+                </div>
+                <div class="mb-3" style="margin-top: 40px; width: 100%; display: flex;">
+                    <input autocomplete="off" class="form-control mx-auto w-auto" name="link" placeholder="Reicpe Link (optional)" type="text" style="flex: 1;">
+                </div>
+                <div class="mb-3">
+                    <div class="col">
+                        <label for="image_upload" style="display: block;">Add image (optional)</label>
+                        <input type="file" class="form-control-file" name="image_upload" accept="image/*">
+                    </div>
+                    <div style="width: 100%; display: flex;">
+                        <input autocomplete="off" class="form-control mx-auto w-auto" name="image_link" placeholder="Image Link (optional)" type="text" style="flex: 1;">
+                    </div>
+                </div>
+                <button class="btn button-css" type="submit">Add Card</button>
+            </form>
+        </main>
+
+        <footer class="mb-5">
+            <div style="text-align: center;">
+                <img id="footer-logo" src="/static/logo-black.svg" alt="Recipe Cards logo" style="height: 100px;">
+                <p class="footer-text">Recipe Cards</p>
+            </div>
+        </footer>
+
+        <script>
+            // If mobile -> show hidden nav elements
+            if (window.innerWidth <= 767) {
+                document.getElementById('mobile-nav-theme').style.display = 'block';
+                document.getElementById('mobile-nav-settings').style.display = 'block';
+                document.getElementById('mobile-nav-logout').style.display = 'block';
+                document.getElementById('nav-dropdown').style.display = 'none';
+            }
+
+
+            // Theme Preferences
+            var CSSLink = document.getElementById('theme');
+            var footerLogo = document.getElementById('footer-logo');
+            var themePreference = localStorage.getItem('themePreference');
+
+            // Set theme to browser preference
+            if (!themePreference) {
+                themePreference = 'none'
+            }
+            if (themePreference == 'dark' || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && themePreference == 'none') {
+                CSSLink.setAttribute('href', '/static/dark.css');
+                footerLogo.setAttribute('src', '/static/logo-white.svg');
+            }
+            else {
+                CSSLink.setAttribute('href', '/static/styles.css');
+                footerLogo.setAttribute('src', '/static/logo-black.svg');
+            }
+
+            // Toggle theme
+            function changeTheme() {
+                if (CSSLink.getAttribute('href') === '/static/styles.css') {
+                    CSSLink.setAttribute('href', '/static/dark.css');
+                    footerLogo.setAttribute('src', '/static/logo-white.svg');
+                    localStorage.setItem('themePreference', 'dark');
+                } else {
+                    CSSLink.setAttribute('href', '/static/styles.css');
+                    footerLogo.setAttribute('src', '/static/logo-black.svg');
+                    localStorage.setItem('themePreference', 'light');
+                }
+            }
+        </script>
+
+    </body>
+
+</html>
