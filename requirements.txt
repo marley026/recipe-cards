@@ -34,7 +34,7 @@ maxminddb==2.8.2
 mf2py==2.0.1
 multidict==6.6.4
 propcache==0.3.2
-psycopg2==2.9.10
+psycopg2-binary==2.9.10
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pydantic==2.11.7
