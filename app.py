@@ -4,6 +4,7 @@ import os
 import psycopg2
 import pytz
 import re
+import secrets
 import uuid
 from flask import Flask, flash, redirect, render_template, request, g, make_response, send_file
 from functools import wraps
@@ -215,7 +216,7 @@ def login():
         
         # Set session
         session_id = str(uuid.uuid4())
-        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time) VALUES (%s, %s, %s, %s, %s)", (session_id, rows[0]['id'], user_ip, user_agent, datetime.datetime.now(pytz.utc)), fetch=False)
+        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time, id) VALUES (%s, %s, %s, %s, %s, %s)", (session_id, rows[0]['id'], user_ip, user_agent, datetime.datetime.now(pytz.utc), secrets.token_hex(6)), fetch=False)
         
         # Set session cookie and redirect home
         response = make_response(redirect('/cards'))
@@ -272,7 +273,7 @@ def register():
         # Set session
         user_id = query_db("SELECT id FROM users WHERE username = %s", (username,), fetch=True)[0]['id']
         session_id = str(uuid.uuid4())
-        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time) VALUES (%s, %s, %s, %s, %s)", (session_id, user_id, user_ip, user_agent, datetime.datetime.now(pytz.utc)), fetch=False)
+        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time, id) VALUES (%s, %s, %s, %s, %s, %s)", (session_id, user_id, user_ip, user_agent, datetime.datetime.now(pytz.utc), secrets.token_hex(6)), fetch=False)
         
         # Set session cookie and redirect home
         response = make_response(redirect('/'))
