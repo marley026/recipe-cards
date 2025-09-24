@@ -157,8 +157,7 @@ def login_required(f):
         current_time = datetime.datetime.now(pytz.utc)
         query_db("UPDATE sessions SET time = %s WHERE session_id = %s", (current_time, session_id), fetch=False)
 
-        # Delete any other sessions
-        query_db("DELETE FROM sessions WHERE user_id = %s AND session_id != %s", (user_id, session_id), fetch=False)
+
 
 
         return f(*args, **kwargs)
