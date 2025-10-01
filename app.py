@@ -324,7 +324,7 @@ def settings():
             sessions_info.append(session_info)
 
 
-        return render_template("settings-1.html", sessions=sessions_info, image=image, sort=sort)
+        return render_template("settings.html", sessions=sessions_info, image=image, sort=sort)
     else:
         settings = {'sort': request.json.get('sort'), 'image': request.json.get('image')}
         query_db("UPDATE users SET settings = %s WHERE id = %s", (json.dumps(settings), get_user_id(),), fetch=False)
