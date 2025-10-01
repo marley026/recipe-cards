@@ -1,9 +1,14 @@
+import datetime
 import extruct
+import geoip2.database
 import html
 import json
+import math
 import os
+import pytz
 import re
 import requests
+import secrets
 import unicodedata
 import uuid
 from bs4 import BeautifulSoup
@@ -11,7 +16,9 @@ from flask import render_template
 from google import genai
 from google.genai import types
 from urllib.parse import urlparse
+from user_agents import parse
 from w3lib.html import get_base_url
+
 
 
 def apology(message, code=400):
@@ -68,7 +75,7 @@ def recipe_route(title):
     title = title.encode('ascii', 'ignore').decode('ascii')
     title = re.sub(r'[^\w\s-]', '', title.lower())
     title = re.sub(r'[-\s]+', '-', title).strip('-')
-    return title + '-' + uuid.uuid4().hex[:6]
+    return title + '-' + secrets.token_hex(3)
 
 
 def sanitize_text(value):
@@ -213,6 +220,8 @@ def format_json(json, url, site):
         if image:
             final['image'] = image
 
+    final['dateSaved'] = datetime.datetime.now(pytz.utc).timestamp()
+
     return sanitize_json(final)
 
 
@@ -270,3 +279,56 @@ def get_recipe_content(url, fetch_type):
     else:
         raise RuntimeError(f"Connection unsuccessful: {response.status_code}")
     raise RuntimeError("No recipe found")
+
+
+def get_time_difference(date):
+    difference = datetime.datetime.now(pytz.utc) - date
+    if difference.days > 0:
+        if difference.days == 1:
+            return "1 day"
+        else:
+            return f"{difference.days} days"
+    else:
+        if difference.seconds >= 60:
+            min = math.trunc(difference.seconds / 60)
+            if min == 1:
+                return "1 minute"
+            else:
+                if min >= 60:
+                    hours = math.trunc(min / 60)
+                    if hours == 1:
+                        return "1 hour"
+                    else:
+                        return f"{hours} hours"
+                else:
+                    return f"{min} minutes"
+        else:
+            if difference.seconds == 1:
+                return "1 second"
+            else:
+                return f"{difference.seconds} seconds"
+            
+
+# IP geolocation
+ip_reader = geoip2.database.Reader('./static/GeoLite2-City.mmdb')
+def get_ip_location(ip):
+    try:
+        response = ip_reader.city(ip)
+        return {
+            "country": response.country.iso_code,
+            "region": response.subdivisions.most_specific.name,
+            "city": response.city.name
+        }
+    except Exception:
+        return None
+    
+
+# Get base user agent info (no version numbers)
+def get_ua_info(ua_string):
+    ua = parse(ua_string)
+
+    return {
+        "browser": ua.browser.family,
+        "os": ua.os.family,
+        "device": ua.device.family
+    }

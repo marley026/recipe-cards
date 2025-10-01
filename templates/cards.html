@@ -17,6 +17,12 @@
     <p style="font-family: serif; font-size: 20pt;">You have no recipes saved.</p>
     <p>Go to "<a href="/add-card-by-url" class="soft-link">Add Card</a>" and paste a link to a recipe you want to save. <br> Or manually input a recipe <a href="/add-card" class="soft-link">here</a></p>
     {% else %}
+    <div id="popup-bg" class="hidden">
+        <div id="popup">
+            <div id="popup-x" class="popup-x"></div>
+            <div id="popup-content"></div>
+        </div>
+    </div>
     <!-- Search -->
     <div id="search" class="searchBox">
         <span class="material-symbols-outlined">search</span>
@@ -43,7 +49,7 @@
         </div>
     </div>
 
-    <script id="data">{{ recipes | safe }}</script>
+    <script id="data" class="{% if sort %}{{ sort }}{% else %}new{% endif %}">{{ recipes | safe }}</script>
     {% endif %}
     
 {% endblock %}

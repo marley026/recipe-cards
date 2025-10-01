@@ -6,7 +6,7 @@
 
 {% block main %}
     <h1 style="text-align: center; margin-bottom: 20px; font-family: serif;">Add Recipe Card</h1>
-    <form action="/add-card-by-url" method="post">
+    <form id="add-card" action="/add-card-by-url" method="post">
         <div class="mb-3">
             <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="url" placeholder="url" type="text">
         </div>
@@ -16,4 +16,9 @@
     <form action="/add-card">
         <button class="btn button-css" type="submit">Add Card Manually</button>
     </form>
+    <script>
+        document.getElementById('add-card').addEventListener('submit', () => {
+            showLoader();
+        });
+    </script>
 {% endblock %}

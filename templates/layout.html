@@ -13,14 +13,16 @@
         {% block links %}{% endblock %}
 
         <link href="/static/logo48.png" rel="icon">
-        <link id="theme" href="/static/styles.css" rel="stylesheet">
-        <link id="customDarkCSS" href="#" rel="stylesheet" disabled>
+        <link href="/static/styles.css" rel="stylesheet">
 
         <title>{% block title %}{% endblock %}</title>
 
     </head>
 
     <body>
+        <div id="loading-overlay">
+            <div class="spinner"></div>
+        </div>
 
         <nav class="navbar navbar-dark navbar-custom navbar-expand-md">
             <div class="container-fluid">
@@ -73,7 +75,7 @@
 
         <footer class="mb-5">
             <div style="text-align: center;">
-                <img id="footer-logo" src="/static/logo-black.svg" alt="Recipe Cards logo" style="height: 100px;">
+                <img id="footer-logo" src="/static/logo-black.svg" alt="Recipe Cards logo">
                 <p class="footer-text">Recipe Cards</p>
             </div>
             {% block in_footer %}{% endblock %}
@@ -81,83 +83,46 @@
 
 
     <script>
-        var CSSLink = document.getElementById('theme');
-        var footerLogo = document.getElementById('footer-logo');
         var themePreference = localStorage.getItem('themePreference');
         var tables = document.querySelectorAll('.table-class');
-        {% if custom_dark_css is defined %}
-        const customDarkLink = document.querySelector('#customDarkCSS');
-        customDarkLink.href = '{{ custom_dark_css }}';
+        const settings_toggle = document.querySelector('.theme-toggle input');
+        
         // Set theme to browser preference
         if (!themePreference) {
             themePreference = 'none'
         }
         if (themePreference == 'dark' || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && themePreference == 'none') {
-            customDarkLink.disabled = false;
-            footerLogo.setAttribute('src', '/static/logo-white.svg');
+            document.body.classList.add('darkmode')
             tables.forEach(function(table) {
                 table.classList.add('table-dark');
             });
-        }
-        else {
-            customDarkLink.disabled = true;
-            footerLogo.setAttribute('src', '/static/logo-black.svg');
+            if (settings_toggle) {
+                settings_toggle.checked = false;
+            }
         }
 
         // Toggle theme
         function changeTheme() {
-            if (customDarkLink.disabled) {
-                customDarkLink.disabled = false;
-                footerLogo.setAttribute('src', '/static/logo-white.svg');
+            if (document.body.classList != 'darkmode') {
+                document.body.classList.add('darkmode');
                 localStorage.setItem('themePreference', 'dark');
                 tables.forEach(function(table) {
                     table.classList.add('table-dark');
                 });
+                if (settings_toggle) {
+                    settings_toggle.checked = false;
+                }
             } else {
-                customDarkLink.disabled = true;
-                footerLogo.setAttribute('src', '/static/logo-black.svg');
+                document.body.classList.remove('darkmode');
                 localStorage.setItem('themePreference', 'light');
                 tables.forEach(function(table) {
                     table.classList.remove('table-dark');
                 });
+                if (settings_toggle) {
+                    settings_toggle.checked = true;
+                }
             }
         }
-        {% else %}
-        // Set theme to browser preference
-        if (!themePreference) {
-            themePreference = 'none'
-        }
-        if (themePreference == 'dark' || window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches && themePreference == 'none') {
-            CSSLink.setAttribute('href', '/static/dark.css');
-            footerLogo.setAttribute('src', '/static/logo-white.svg');
-            tables.forEach(function(table) {
-                table.classList.add('table-dark');
-            });
-        }
-        else {
-            CSSLink.setAttribute('href', '/static/styles.css');
-            footerLogo.setAttribute('src', '/static/logo-black.svg');
-        }
-
-        // Toggle theme
-        function changeTheme() {
-            if (CSSLink.getAttribute('href') === '/static/styles.css') {
-                CSSLink.setAttribute('href', '/static/dark.css');
-                footerLogo.setAttribute('src', '/static/logo-white.svg');
-                localStorage.setItem('themePreference', 'dark');
-                tables.forEach(function(table) {
-                    table.classList.add('table-dark');
-                });
-            } else {
-                CSSLink.setAttribute('href', '/static/styles.css');
-                footerLogo.setAttribute('src', '/static/logo-black.svg');
-                localStorage.setItem('themePreference', 'light');
-                tables.forEach(function(table) {
-                    table.classList.remove('table-dark');
-                });
-            }
-        }
-        {% endif %};
 
 
         
@@ -169,6 +134,14 @@
             document.getElementById('mobile-nav-logout').style.display = 'block';
             document.getElementById('nav-dropdown').style.display = 'none';
         }
+
+        function showLoader() {
+  document.getElementById("loading-overlay").style.display = "flex";
+}
+
+function hideLoader() {
+  document.getElementById("loading-overlay").style.display = "none";
+}
     </script>
 
     </body>

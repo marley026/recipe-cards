@@ -2,6 +2,7 @@ function makeCard(recipe) {
   const container = document.getElementById('card-container');
     const card = document.createElement('div');
     card.setAttribute('class', 'col-12 col-md-6 col-lg-4 col-xl-3');
+    card.id = recipe['@id'];
 
     // Image
     let img = '';
@@ -80,29 +81,22 @@ function initializeMasonry() {
 function remove_card(event) {
   event.preventDefault();
 
-  if (confirm("Are you sure you want to delete recipe?")) {
-      route = event.currentTarget.querySelector('[name="recipe_route"]').value;
+  const route = event.currentTarget.querySelector('[name="recipe_route"]').value;
 
-      fetch("/remove-card", {
-          method: "POST",
-          headers: {"Content-Type": "application/json"},
-          body: JSON.stringify({ recipe_route: route })
-      })
-      .then(response => {
-          if (response.ok) {
-              window.location.href = "/cards";
-          } else {
-              alert("Failed to delete recipe");
-          }
-      });
-  }
+  const popupBG = document.querySelector('#popup-bg');
+  popupBG.classList.remove('hidden');
+  document.querySelector('#popup-content').innerHTML = `Are you sure you want to delete your "${document.querySelector(`#${route} .card-title`).innerText}" recipe?<br><br>
+  <button id="confirm-delete" class="btn delete-button">DELETE RECIPE</button>
+  <button id="cancel-delete" class="btn button-css">Cancel</button>
+  <input id="confirmed-recipe-route" type="hidden" name="recipe_route" value="${route}">`;
 }
 
 
 
 // Initial load
 document.addEventListener('DOMContentLoaded', function() {
-  const recipes = JSON.parse(`${document.getElementById('data').innerText}`);
+  const recipes = sort(JSON.parse(`${document.getElementById('data').innerText}`));
+  
   renderCards(recipes);
 
   // Search
@@ -132,4 +126,45 @@ document.addEventListener('DOMContentLoaded', function() {
       renderCards(results.map(result => result.item), query);
     }
   });
+
+
+  document.getElementById('popup-bg').addEventListener('click', (e) => {
+      if (e.target.id == 'popup-bg' || e.target.id == 'cancel-delete' || e.target.id == 'popup-x') {
+        document.querySelector('#popup-bg').classList.add('hidden');
+      } else if (e.target.id == "confirm-delete") {
+        const route = document.getElementById('confirmed-recipe-route').value;
+        showLoader();
+        fetch("/remove-card", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({ recipe_route: route })
+        })
+        .then(response => {
+            if (response.ok) {
+              hideLoader();
+                document.querySelector('#popup-bg').classList.add('hidden');
+                setTimeout(() => {
+                  const container = document.getElementById('card-container');
+                  const masonry = container.masonryInstance; 
+                  masonry.remove(document.getElementById(route));
+                  masonry.layout();
+                }, 500);
+            } else {
+              hideLoader();
+                alert("Failed to delete recipe");
+            }
+        });
+      }
+  });
 });
+
+function sort(recipes) {
+  switch (document.getElementById('data').classList[0]) {
+    case "new":
+      return recipes.sort((a, b) => b.dateSaved - a.dateSaved);
+    case "old":
+      return recipes.sort((a, b) => a.dateSaved - b.dateSaved);
+    case "name":
+      return recipes.sort((a, b) => a.name.localeCompare(b.name));
+  }
+}

@@ -61,6 +61,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         image.alt = recipe['name'];
 
+        if (document.getElementById("image-check").checked == false) {
+            document.getElementById("image-div").style.display = 'none';
+        }
+
         // Image toggle
         document.getElementById('switch').style = '';
 
@@ -79,6 +83,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const meta = document.createElement('div');
         meta.classList.add('recipe-meta');
 
+        const metaTop = document.createElement('div');
+        metaTop.classList.add('meta-top');
+
         if (recipe['author']) {
             const author = document.createElement('span');
             if (Array.isArray(recipe['author'])) {
@@ -90,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 if (recipe['author']['name']) {author.innerHTML = `<strong>Author:</strong> ${recipe['author']['name']}`;}
             }
-            meta.appendChild(author);
+            metaTop.appendChild(author);
         }
         if (recipe['recipeYield']) {
             const yield = document.createElement('span');
@@ -99,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 yield.innerHTML = `<strong>Yield:</strong> ${recipe['recipeYield']}`;
             }
-            meta.appendChild(yield);
+            metaTop.appendChild(yield);
         }
         if (recipe['totalTime']) {
             const time = document.createElement('span');
@@ -126,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 time.innerHTML = `<strong>Total Time:</strong> ${recipe['totalTime'].startsWith('PT') ? timeConvert(recipe['totalTime']) : recipe['totalTime']}`;
             }
-            meta.appendChild(time);
+            metaTop.appendChild(time);
 
             time.addEventListener('click', function () {
                 const arrow = document.querySelector('#time-dropdown');
@@ -143,6 +150,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+        meta.appendChild(metaTop)
         if (recipe['description'] || recipe['articleBody']) {
             const desc = document.createElement('p');
             desc.classList.add('recipe-desc');

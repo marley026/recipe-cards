@@ -1,18 +1,19 @@
 import datetime
 import json
 import os
+import math
 import psycopg2
 import pytz
 import re
+import secrets
 import uuid
-from flask import Flask, flash, redirect, render_template, request, g, make_response, send_file
+from flask import Flask, flash, redirect, render_template, request, g, make_response, send_file, jsonify, Response
 from functools import wraps
-import geoip2.database
 from psycopg2.extras import DictCursor
-from user_agents import parse
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from helpers import apology, recipe_route, get_image_link, separate_content, get_recipe_content
+
+from helpers import apology, recipe_route, get_image_link, separate_content, get_recipe_content, get_time_difference, get_ip_location, get_ua_info
 
 
 # Configure application
@@ -70,32 +71,6 @@ def after_request(response):
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
-
-
-
-# IP geolocation
-ip_reader = geoip2.database.Reader('./static/GeoLite2-City.mmdb')
-def get_ip_location(ip):
-    try:
-        response = ip_reader.city(ip)
-        return {
-            "country": response.country.iso_code,
-            "region": response.subdivisions.most_specific.name,
-            "city": response.city.name
-        }
-    except Exception:
-        return None
-    
-
-# Get base user agent info (no version numbers)
-def get_ua_info(ua_string):
-    ua = parse(ua_string)
-
-    return {
-        "browser": ua.browser.family,
-        "os": ua.os.family,
-        "device": ua.device.family
-    }
     
 
 def login_required(f):
@@ -136,6 +111,7 @@ def login_required(f):
             logged_location = get_ip_location(session[0]['ip'])
             current_location = get_ip_location(user_ip)
             if logged_location['country'] != current_location['country'] or logged_location['region'] != current_location['region']:
+                query_db("INSERT INTO errors (url, user_id) VALUES (%s, %s)", (f"old:{logged_location}   new:{current_location}", user_id), fetch=False)
                 query_db("DELETE FROM sessions WHERE session_id = %s", (session_id,), fetch=False)
                 response = make_response(redirect('/login'))
                 response.delete_cookie('session_id', httponly=True, secure=True, samesite='Lax')
@@ -156,9 +132,6 @@ def login_required(f):
         current_time = datetime.datetime.now(pytz.utc)
         query_db("UPDATE sessions SET time = %s WHERE session_id = %s", (current_time, session_id), fetch=False)
 
-        # Delete any other sessions
-        query_db("DELETE FROM sessions WHERE user_id = %s AND session_id != %s", (user_id, session_id), fetch=False)
-
 
         return f(*args, **kwargs)
     return decorated_function
@@ -171,6 +144,11 @@ def get_user_id():
         return user_id[0]['user_id']
     else:
         return None
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('error.html'), 404
 
 
 @app.route('/favicon.ico')
@@ -215,7 +193,7 @@ def login():
         
         # Set session
         session_id = str(uuid.uuid4())
-        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time) VALUES (%s, %s, %s, %s, %s)", (session_id, rows[0]['id'], user_ip, user_agent, datetime.datetime.now(pytz.utc)), fetch=False)
+        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time, id) VALUES (%s, %s, %s, %s, %s, %s)", (session_id, rows[0]['id'], user_ip, user_agent, datetime.datetime.now(pytz.utc), secrets.token_hex(6)), fetch=False)
         
         # Set session cookie and redirect home
         response = make_response(redirect('/cards'))
@@ -228,14 +206,29 @@ def login():
 
 
 @app.route("/logout")
+@login_required
 def logout():
     # Delete session
-    query_db("DELETE FROM sessions WHERE user_id = %s", (get_user_id(),), fetch=False)
+    query_db("DELETE FROM sessions WHERE session_id = %s", (request.cookies.get('session_id'),), fetch=False)
 
     response = make_response(redirect('/'))
     response.delete_cookie('session_id', httponly=True, secure=True, samesite='Lax')
     return response
 
+@app.route("/log_out_post", methods=["POST"])
+@login_required
+def log_out():
+    id = request.json.get('id')
+    if not id:
+        return jsonify({'error': 'no session id received'}), 401
+    
+
+    if id == 'ALL':
+        query_db("DELETE FROM sessions WHERE user_id = %s", (get_user_id(),), fetch=False)
+    else:
+        query_db("DELETE FROM sessions WHERE user_id = %s AND id = %s", (get_user_id(), id), fetch=False)
+
+    return jsonify({'sucess': 'logging out', 'error': 'None'})
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -272,7 +265,7 @@ def register():
         # Set session
         user_id = query_db("SELECT id FROM users WHERE username = %s", (username,), fetch=True)[0]['id']
         session_id = str(uuid.uuid4())
-        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time) VALUES (%s, %s, %s, %s, %s)", (session_id, user_id, user_ip, user_agent, datetime.datetime.now(pytz.utc)), fetch=False)
+        query_db("INSERT INTO sessions (session_id, user_id, ip, user_agent, time, id) VALUES (%s, %s, %s, %s, %s, %s)", (session_id, user_id, user_ip, user_agent, datetime.datetime.now(pytz.utc), secrets.token_hex(6)), fetch=False)
         
         # Set session cookie and redirect home
         response = make_response(redirect('/'))
@@ -284,106 +277,206 @@ def register():
         return render_template("register.html")
 
 
-@app.route("/settings", methods=["GET"])
+@app.route("/settings", methods=["GET", "POST"])
 @login_required
 def settings():
-    return render_template("settings.html")
+    if request.method == "GET":
+        user_id = get_user_id()
+        settings = query_db("SELECT settings FROM users WHERE id = %s", (user_id,), fetch=True)
+        image = None
+        sort = None
+        if settings[0]['settings']:
+            image = settings[0]['settings']['image']
+            sort = settings[0]['settings']['sort']
+
+        sessions =  query_db("SELECT * FROM sessions WHERE user_id = %s", (user_id,), fetch=True)
+        sessions_info = []
+
+        for session in sessions:
+            session_info = {
+                "info": 'Chrome on Windows (Texas, USA)',
+                "lastActive": "2 hours",
+                "id": session['id'],
+                "current": False
+            }
+
+            location = get_ip_location(session['ip'])
+            if location:
+                location = f"({location['region']}, {location['country']})"
+            else:
+                location = "(unknown location)"
+            
+            ua = get_ua_info(session['user_agent'])
+            if ua:
+                if ua['device'] in ("Other", "Mac"):
+                    ua['device'] = ua['os']
+                session_info['info'] = f"{ua['browser']} on {ua['device']} {location}"
+            else:
+                session_info['info'] = f"unknown device {location}"
+
+
+            session_info['lastActive'] = get_time_difference(session['time'])
+
+            if session['session_id'] == request.cookies.get('session_id'):
+                session_info['current'] = True
+
+
+            sessions_info.append(session_info)
+
+
+        return render_template("settings-1.html", sessions=sessions_info, image=image, sort=sort)
+    else:
+        settings = {'sort': request.json.get('sort'), 'image': request.json.get('image')}
+        query_db("UPDATE users SET settings = %s WHERE id = %s", (json.dumps(settings), get_user_id(),), fetch=False)
+        return "saved", 200
+
+            
+
+
+@app.route("/delete-all-recipes", methods=["POST"])
+@login_required
+def del_all_rec():
+    password = request.json.get('password')
+    if not password:
+        return jsonify({'error': 'no password received'}), 400
+    
+    id = get_user_id()
+    if not id:
+        return jsonify({'error': 'user not logged in'}), 401
+
+    rows = query_db("SELECT * FROM users WHERE id = %s", (id,), fetch=True)
+    if len(rows) != 1:
+        return jsonify({'error': 'user not found'}), 500
+    elif not check_password_hash(rows[0]["hash"], password):
+        return jsonify({'error': 'invalid password'}), 400
+    
+
+    query_db("DELETE FROM recipes WHERE user_id = %s", (id,), fetch=False)
+    
+    return jsonify({'sucess': 'deleting recipes', 'error': 'None'})
 
 
 @app.route("/update_password", methods=["POST"])
 @login_required
 def update_password():
     # Ensure passwords was submitted
-    old = request.form.get("password")
+    old = request.json.get('password')
     if not old:
-        return apology("must provide old password", 400)
-    password = request.form.get("new_password")
+        return jsonify({'error': 'old password not received'}), 400
+
+    password = request.json.get('new_password')
     if not password:
-        return apology("must provide new password", 400)
-    elif not request.form.get("confirmation"):
-        return apology("must confirm password", 400)
+        return jsonify({'error': 'new password not received'}), 400
+
 
     # Check password
     id = get_user_id()
+    if not id:
+        return jsonify({'error': 'user not logged in'}), 401
+    
     hash = query_db("SELECT hash FROM users WHERE id = %s", (id,), fetch=True)
     if not check_password_hash(hash[0]["hash"], old):
-        return apology("invalid password", 400)
+        return jsonify({'error': 'invalid password'}), 400
 
-    # Ensure password and confirmation match
-    if password != request.form.get("confirmation"):
-        return apology("passwords must match", 400)
 
     # Update password
     query_db("UPDATE users SET hash = %s WHERE id = %s", (generate_password_hash(password), id), fetch=False)
 
-    flash("Password Updated!")
-
-    return redirect("/settings")
+    return jsonify({'sucess': 'updating password', 'error': 'None'})
 
 
 @app.route("/update_username", methods=["POST"])
 @login_required
 def update_username():
     # Ensure inputs added
-    password = request.form.get("password")
+    password = request.json.get('password')
     if not password:
-        return apology("must provide password", 400)
-    username = request.form.get("new_username")
+        return jsonify({'error': 'no password received'}), 400
+    username = request.json.get("username")
     if not username:
-        return apology("must provide new username", 400)
+        return jsonify({'error': 'no username received'}), 400
     username = username.upper()
 
     # Check password
     id = get_user_id()
+    if not id:
+        return jsonify({'error': 'user not logged in'}), 401
+    
     hash = query_db("SELECT hash FROM users WHERE id = %s", (id,), fetch=True)
     if not check_password_hash(hash[0]["hash"], password):
-        return apology("invalid password", 400)
+        return jsonify({'error': 'invalid password'}), 400
 
     # Check if username taken
     check_user = query_db("SELECT * FROM users WHERE username = %s", (username,), fetch=True)
     if len(check_user) != 0:
-        return apology("username taken", 400)
+        return jsonify({'error': 'username taken'}), 500
 
     # Update username
     query_db("UPDATE users SET username = %s WHERE id = %s", (username, id), fetch=False)
 
-    flash("Username Updated!")
-    return redirect("/settings")
+    return jsonify({'sucess': 'updating username', 'error': 'None'})
 
 
 @app.route("/delete_account", methods=["POST"])
+@login_required
 def delete_account():
-    # Get id and password
-    id = get_user_id()
     password = request.json.get('password')
+    id = get_user_id()
+    if not id:
+        return jsonify({'error': 'user not logged in'}), 401
 
     # Check password
     hash = query_db("SELECT hash FROM users WHERE id = %s", (id,), fetch=True)
     if not check_password_hash(hash[0]["hash"], password):
-        return 'Unauthorized', 401
+        return jsonify({'error': 'invalid password'}), 400
 
     # Forget user data
     query_db("DELETE FROM users WHERE id = %s", (id,), fetch=False)
     query_db("DELETE FROM recipes WHERE user_id = %s", (id,), fetch=False)
     query_db("DELETE FROM sessions WHERE user_id = %s", (get_user_id(),), fetch=False)
 
-    # Clear cookies and redirect home
-    response = make_response(redirect('/'))
-    response.delete_cookie('session_id', httponly=True, secure=True, samesite='Lax')
-    return response
+    return jsonify({'sucess': 'deleting account', 'error': 'None'})
+
+
+@app.route("/get_recipes", methods=["POST"])
+@login_required
+def get_recipes():
+    id = get_user_id()
+    if not id:
+        return jsonify({'error': 'user not logged in'}), 401
+    
+    user = query_db("SELECT username FROM users WHERE id = %s", (id,), fetch=True)
+    recipes = query_db("SELECT * FROM recipes WHERE user_id = %s", (id,), fetch=True)
+
+    for recipe in recipes:
+        del recipe['user_id']
+
+    file = f'{str(datetime.date.today()).replace("-", "")}-{user[0]['username'].lower()}-recipes.json'
+
+    return jsonify({'data': recipes, 'file': file, 'error': 'None'})
+
+    
 
 
 @app.route("/cards", methods=["GET"])
 @login_required
 def cards():
-    data = query_db("SELECT contents FROM recipes WHERE user_id = %s", (get_user_id(),), fetch=True)
+    user_id = get_user_id()
+    
+    data = query_db("SELECT contents FROM recipes WHERE user_id = %s", (user_id,), fetch=True)
     recipes = []
     for recipe in data:
         recipes.append(recipe['contents'])
 
     if len(recipes) < 1:
         return render_template("cards.html", data=False)
-    return render_template("cards.html", recipes=json.dumps(recipes), data=True)
+    
+    settings = query_db("SELECT settings FROM users WHERE id = %s", (user_id,), fetch=True)
+    sort = None
+    if settings[0]['settings']:
+        sort = settings[0]['settings']['sort']
+
+    return render_template("cards.html", recipes=json.dumps(recipes), sort=sort, data=True)
 
 
 @app.route("/add-card", methods=["GET", "Post"])
@@ -475,24 +568,31 @@ def show_recipe(recipe_route):
     # Find recipe
     recipe_data = query_db("SELECT * FROM recipes WHERE route = %s", (recipe_route,), fetch=True)
 
-    if recipe_data is None:
-        return apology("recipe not found", 404)
+    if len(recipe_data) == 0:
+        return render_template('error.html'), 404
+    
+    settings = query_db("SELECT settings FROM users WHERE id = %s", (get_user_id(),), fetch=True)
+    image = False
+    if settings[0]['settings']:
+        image = settings[0]['settings']['image']
 
-    return render_template("recipe.html", recipeJSON=json.dumps(recipe_data[0]['contents']))
+    return render_template("recipe.html", recipeJSON=json.dumps(recipe_data[0]['contents']), image=image)
 
 
 @app.route('/recipe/share/<recipe_route>')
 def share_recipe(recipe_route):
-    return apology("recipe not found", 404)
+    return render_template('error.html'), 404
 
 
 @app.route("/remove-card", methods=["POST"])
+@login_required
 def remove_card():
     recipe_route = request.json.get('recipe_route')
 
-    query_db("DELETE FROM recipes WHERE route = %s", (recipe_route,), fetch=False)
+    query_db("DELETE FROM recipes WHERE route = %s AND user_id = %s", (recipe_route, get_user_id()), fetch=False)
 
-    return redirect("/cards")
+    return jsonify({'sucess': 'deleting account', 'error': 'None'})
+
 
 
 @app.route("/add-card-by-url", methods=["POST", "GET"])
@@ -529,8 +629,8 @@ def add_card_by_url():
         recipe["@id"] = route
 
         query_db(
-            "INSERT INTO recipes (user_id, title, contents, url, route) VALUES (%s, %s, %s, %s, %s)",
-            (get_user_id(), recipe['name'], json.dumps(recipe), url, route), fetch=False
+            "INSERT INTO recipes (user_id, title, contents, url, route, date) VALUES (%s, %s, %s, %s, %s, %s)",
+            (get_user_id(), recipe['name'], json.dumps(recipe), url, route, datetime.datetime.now(pytz.utc)), fetch=False
         )
 
         return redirect("/recipe/" + route)

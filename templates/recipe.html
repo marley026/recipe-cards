@@ -1,4 +1,3 @@
-{% set custom_dark_css = "/static/dark-recipe.css" %}
 {% extends "layout.html" %}
 
 {% block links %}
@@ -20,7 +19,7 @@
 <div id="settings-bar">
     <div id="switch" style="display: none;">
         <div id="image-toggle">
-            <input id="image-check" class="image-check" type="checkbox" role="switch" checked="">
+            <input id="image-check" class="image-check" type="checkbox" role="switch" {% if image == False %}checked=""{% endif %}>
         </div>
     </div>
     
@@ -40,16 +39,18 @@
         <img class="recipe-image" src="#" alt="Title"/>
     </div>
     <!-- <div class="recipe-meta">
-        <span><strong>Author:</strong> author</span>
-        <span><strong>Yield:</strong> yield</span>
-        <span id="times">
-            <strong>Total Time:</strong> 1 hour
-            <span id="time-dropdown" class="arrow down"></span>
-            <ul class="additional-time">
-                <li><strong>Prep Time:</strong> 30 min</li>
-                <li><strong>Cook Time:</strong> 30 min</li>
-            </ul>
-        </span>
+        <div class="meta-top">
+            <span><strong>Author:</strong> author</span>
+            <span><strong>Yield:</strong> yield</span>
+            <span id="times">
+                <strong>Total Time:</strong> 1 hour
+                <span id="time-dropdown" class="arrow down"></span>
+                <ul class="additional-time">
+                    <li><strong>Prep Time:</strong> 30 min</li>
+                    <li><strong>Cook Time:</strong> 30 min</li>
+                </ul>
+            </span>
+        </div>
         <p class="recipe-desc">description</p>
     </div> -->
 </div>

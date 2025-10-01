@@ -1,0 +1,378 @@
+:root {
+    --theme-toggle-color: #555;
+    --np-background: #eee;
+    --logo-filter: opacity(15%);
+    --np-form-bg: rgb(255,255,255,.95);
+    --np-shadow: rgba(0, 0, 0, 0.25);
+    --current-button: #ccc;
+    --current-txt: #333;
+    --np-exit-bg: white;
+    --np-exit-hover: #f7f7f7;
+    --np-exit-shadow: rgb(0,0,0,.2);
+    
+    --image-check-bg: #171717;
+    --image-check-after: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><path fill="white" d="M9,.09C4.08.09.09,4.08.09,9s3.99,8.91,8.91,8.91,8.91-3.99,8.91-8.91S13.92.09,9,.09ZM4.44,4.44c.29-.29.64-.44,1.06-.44s.77.15,1.06.44.44.64.44,1.06-.15.77-.44,1.06-.64.44-1.06.44-.77-.15-1.06-.44-.44-.64-.44-1.06.15-.77.44-1.06ZM3,14l3-4,2.25,3,3-4,3.75,5H3Z"/></svg>');
+}
+
+.darkmode {
+    --theme-toggle-color: #fff;
+    --np-background: #212121;
+    --logo-filter: invert(100) opacity(5%);
+    --np-form-bg: rgb(23,23,23,.95);
+    --np-shadow: rgba(255, 255, 255, 0.15);
+    --current-button: #666;
+    --current-txt: #ccc;
+    --np-exit-bg: #2d2d2d;
+    --np-exit-hover: #2a2a2a;
+    --np-exit-shadow: rgb(255,255,255,.2);
+    
+    --image-check-bg: #4f4f4f;
+    --image-check-after: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 18 18"><path fill="%23ddd" d="M9,.09C4.08.09.09,4.08.09,9s3.99,8.91,8.91,8.91,8.91-3.99,8.91-8.91S13.92.09,9,.09ZM4.44,4.44c.29-.29.64-.44,1.06-.44s.77.15,1.06.44.44.64.44,1.06-.15.77-.44,1.06-.64.44-1.06.44-.77-.15-1.06-.44-.44-.64-.44-1.06.15-.77.44-1.06ZM3,14l3-4,2.25,3,3-4,3.75,5H3Z"/></svg>');
+}
+
+.settings {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 20px;
+}
+
+.sessions {
+    grid-column: span 2;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--primary-text);
+}
+
+.session-list {
+    width: 50%;
+    margin: auto;
+    margin-bottom: 10px;
+}
+.session {
+    display: grid;
+    grid-template-columns: 5fr 1fr;
+    align-items: center;
+    border-bottom: 2px solid grey;
+}
+.session-details {
+    text-align: left;
+    margin: 0px;
+    padding: 5px;
+}
+.session-button {
+    text-align: right;
+    padding: 5px;
+}
+
+.last-row {
+    border-bottom: none;
+}
+
+.data, .delete-account {
+    padding: 20px
+}
+
+.delete-account {
+    text-align: left;
+}
+
+#current-button {
+    background-color: var(--current-button);
+}
+
+#current-button::after {
+    color: var(--current-txt);
+    content: 'Current';
+}
+
+#current-button:hover {
+    background-color: var(--button-color);
+}
+
+#current-button:hover::after {
+    color: white;
+    content: 'Log Out';
+}
+
+/* Mobile Styling */
+@media (max-width: 1200px) {
+    .session-list {
+        width: 75%;
+    }
+}
+@media (max-width: 1000px) {
+    .session-list {
+        width: 100%;
+    }
+}
+@media (max-width: 768px) {
+    .settings div {
+        grid-column: span 2;
+    }
+    h2 {
+        font-size: 22pt;
+    }
+    .sessions {
+        padding-bottom: 0px;
+    }
+    .session-list {
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    .session {
+        grid-template-columns: 1fr;
+    }
+    .session-details, .session-button {
+        text-align: center;
+    }
+    .dash {
+        display: none;
+    }
+    .time {
+        display: block;
+    }
+}
+
+.dark-mode-div, .recipe-sort-div, .recipe-image-div {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    gap: .5em;
+}
+
+.dark-mode-div p, .recipe-sort-div p, .recipe-image-div p {
+    margin: 0px;
+}
+
+.recipe-sort-div, .recipe-image-div {
+    margin-top: .5em;
+}
+
+#recipe-sort {
+    background: var(--button-color);
+    color: white;
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 10pt;
+}
+
+.account span, #export{
+    transition: color 0.15s ease-in-out;
+    cursor: pointer;
+    position: relative;
+    z-index: 0;
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0;
+      height: 1px;
+      background-color: var(--muted-text);
+      transition: width 0.15s ease-in;
+    }
+}
+
+
+.account span:hover, #export:hover{
+    cursor: pointer;
+    color: var(--muted-text);
+    &::after {
+      width: 100%;
+    }
+}
+
+#next-page {
+    width: 100vw;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: all;
+    background-color: var(--np-background);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: left 1.5s ease;
+    z-index: 1;
+}
+
+#next-page.hidden {
+    left: 100vw;
+    pointer-events: none;
+}
+
+#next-page h1 {
+    font-family: serif;
+    margin-bottom: .5em;
+}
+
+.form-container {
+    width: 500px;
+    min-height: 300px;
+    max-width: 95vw;
+    max-height: 95vh;
+    background: var(--np-form-bg);
+    box-shadow: 0 0 3px 3px var(--np-shadow);
+    padding: 30px;
+    border-radius: 20px;
+    text-align: center;
+}
+
+.form-container-div {
+    z-index: 3;
+}
+
+#bg-logo {
+    height: 95vh;
+    max-width: 95vw;
+    position: absolute;
+    z-index: 2;
+    filter: var(--logo-filter);
+}
+
+@media (max-width: 600px) {
+    #bg-logo {
+        display: none;
+    }
+    .mobile {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: url('/static/logo-black.svg') repeat center;
+        background-size: 50% auto;
+        filter: var(--logo-filter);
+    }
+
+}
+
+body.no-scroll {
+    overflow: hidden;
+    position: fixed;
+    width: 100%;
+}
+
+
+
+
+#np-exit {
+    position: absolute;
+    background: var(--np-exit-bg);
+    box-shadow: 0 0 3px 3px var(--np-exit-shadow);
+    width: 2.5em;
+    height: 2.5em;
+    top: 20px;
+    left: 20px;
+    z-index: 3;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background .2s ease-in-out, box-shadow .2s ease-in-out;
+}
+
+#np-exit:hover {
+    background: var(--np-exit-hover);
+    box-shadow: 0 0 2px 2px var(--np-exit-shadow);
+}
+
+@keyframes inputError {
+    0% {left: 0px;}
+    25% {left: 10px;}
+    75% {left: -10px;}
+    100% {left: 0px;}
+}
+
+#delete-all-recipes input.error, #next-page input.error, #delete-account input.error {
+    position: relative;
+    border-color: rgba(200,50,50,.25);
+    box-shadow: 0 0 0 .15rem rgba(200,50,50,.25);
+    animation: inputError 0.2s ease-in-out 0s 2;
+}
+
+#next-page input[name='new_username'].error {
+    border-color: rgba(255,195,5,.5);
+    box-shadow: 0 0 0 .15rem rgba(255,195,5,.5);
+}
+
+#delete-all-recipes input.error:focus, #next-page input.error:focus, #delete-account input.error:focus {
+    border-color: rgba(255,0,0,.25);
+    box-shadow: 0 0 0 .15rem rgba(255,0,0,.25);
+}
+
+#next-page input[name='new_username'].error:focus {
+    border-color: rgba(255,195,5,.5);
+    box-shadow: 0 0 0 .15rem rgba(255,195,5,.5);
+}
+
+#next-page .mb-3.empty {
+    position: relative;
+}
+
+#next-page .mb-3.empty::after {
+    content: "";
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="orange"><path d="M480-280q17 0 28.5-11.5T520-320q0-17-11.5-28.5T480-360q-17 0-28.5 11.5T440-320q0 17 11.5 28.5T480-280Zm-40-160h80v-240h-80v240Zm40 360q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>') no-repeat center;
+    width: 25px;
+    height: 25px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translateY(-50%) translateX(72px);
+    pointer-events: none;
+}
+
+#verify-message {
+    max-height: 0px;
+    overflow: hidden;
+    color: red;
+    transition: max-height 1s ease;
+}
+
+#message {
+    position: fixed;
+    width: 100%;
+    z-index: 100;
+    left: 0px;
+    top: 0px;
+    transition: top 1s ease;
+}
+
+#message.hidden {
+    top: -100px;
+}
+
+
+
+
+#image-toggle {
+    height: 20px;
+}
+
+#image-check {
+    -webkit-appearance: none;
+    position: relative;
+    width: 44px;
+    height: 22px;
+    border-radius: 25px;
+    background-color: var(--image-check-bg);
+    transition: background .3s;
+    outline: none;
+    cursor: pointer;
+}
+
+#image-check::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 12px;
+    transform: translate(-50%, -50%);
+    height: 18px;
+    width: 18px;
+    background: var(--image-check-after) no-repeat center/contain;
+    transition: left .3s;
+}
+
+#image-check:checked::after {
+    left: 32px;
+}
