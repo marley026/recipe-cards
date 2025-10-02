@@ -148,7 +148,7 @@ def get_user_id():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('error.html'), 404
+    return render_template('404.html'), 404
 
 
 @app.route('/favicon.ico')
@@ -569,7 +569,7 @@ def show_recipe(recipe_route):
     recipe_data = query_db("SELECT * FROM recipes WHERE route = %s", (recipe_route,), fetch=True)
 
     if len(recipe_data) == 0:
-        return render_template('error.html'), 404
+        return render_template('404.html'), 404
     
     settings = query_db("SELECT settings FROM users WHERE id = %s", (get_user_id(),), fetch=True)
     image = False
@@ -581,7 +581,7 @@ def show_recipe(recipe_route):
 
 @app.route('/recipe/share/<recipe_route>')
 def share_recipe(recipe_route):
-    return render_template('error.html'), 404
+    return render_template('404.html'), 404
 
 
 @app.route("/remove-card", methods=["POST"])
