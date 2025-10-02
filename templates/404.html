@@ -1,0 +1,154 @@
+{% extends "layout.html" %}
+
+{% block links %}
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=keyboard_arrow_down" />
+{% endblock %}
+
+{% block title %}
+    404
+{% endblock %}
+
+{% block before_main %}
+<svg id="background-error" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1900 900">
+  <path class="st0" d="M589.83,565.71v90.51h-116.23v228.34h-105.94v-228.34H.46v-81.59L402.97,0h70.63v565.71h116.23ZM367.66,565.71V136.16L63.16,565.71h304.51Z"/>
+  <path class="st0" d="M682.06,456.4c0-98.87,14.93-183.99,44.82-255.36,29.88-71.37,69.57-124.54,119.11-159.49C884.4,13.85,924.11,0,965.09,0c66.6,0,126.37,33.88,179.31,101.64,66.17,83.96,99.26,197.73,99.26,341.34,0,100.57-14.53,186.01-43.55,256.32-29.02,70.31-66.07,121.34-111.1,153.08-45.03,31.76-88.47,47.62-130.31,47.62-82.83,0-151.78-48.79-206.84-146.38-46.54-82.24-69.8-181.32-69.8-297.23ZM807.54,472.45c0,119.35,14.72,216.74,44.2,292.18,24.33,63.51,60.62,95.26,108.88,95.26,23.05,0,46.96-10.33,71.73-31,24.75-20.67,43.54-55.3,56.36-103.9,19.64-73.3,29.46-176.66,29.46-310.08,0-98.87-10.25-181.35-30.74-247.42-15.38-49.02-35.23-83.75-59.56-104.21-17.52-14.06-38.65-21.1-63.4-21.1-29.04,0-54.87,13-77.5,39.01-30.76,35.37-51.69,91-62.78,166.87-11.11,75.87-16.65,150.67-16.65,224.41Z"/>
+  <path class="st0" d="M1899.54,565.71v90.51h-116.23v228.34h-105.94v-228.34h-367.2v-81.59L1712.68,0h70.63v565.71h116.23ZM1677.37,565.71V136.16l-304.51,429.56h304.51Z"/>
+</svg>
+{% endblock %}
+
+{% block main %}
+<div id="error">
+    <h1>404</h1>
+    <p class="apology">Sorry, page not found<br><br></p>
+    <div id="scroll">
+        <p><span class="down">But here's a cookie recipe...</span></p>
+        <span class="material-symbols-outlined down">keyboard_arrow_down</span>
+    </div>
+</div>
+
+<div class="recipe">
+    <h1>Chocolate Chip Cookies</h1>
+    <section class="ingredients">
+        <h2>Ingredients</h2>
+        <ul>
+            <li>3 cups (390g) all-purpose flour</li>
+            <li>1 tsp baking soda</li>
+            <li>&frac12; tsp baking powder</li>
+            <li>1&frac12; tsp salt</li>
+            <li>1 cup (2 sticks) unsalted butter, softened</li>
+            <li>1 cup (200g) granulated sugar</li>
+            <li>1 cup (200g) brown sugar</li>
+            <li>2 tsp vanilla extract</li>
+            <li>2 large eggs, room temperature</li>
+            <li>1&frac12; cups chocolate chips</li>
+        </ul>
+    </section>
+
+    <section class="directions">
+        <h2>Directions</h2>
+        <ol>
+            <li>Whisk the flour, baking soda, baking powder, and salt together in a medium bowl, set aside.</li>
+            <li>In a large bowl, cream the butter, granulated, and brown sugars together. Beat in the vanilla extract and eggs.</li>
+            <li>Fold in the dry ingredients, then add the chocolate chips. Cover and refrigerate for at least 30 minutes.</li>
+            <li>Preheat oven to 350&deg;F. Portion the dough into 2" balls, about 2 Tbsp each. Place on a parchemnt lined baking sheet and bake for 10-12 minutes.</li>
+        </ol>
+    </section>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const rect = document.getElementById('error').getBoundingClientRect();
+console.log(rect.top);
+document.querySelector('.recipe').style.marginTop = `${window.innerHeight - (rect.height + rect.top)}px`;
+});
+
+const spans = document.querySelectorAll('.down');
+spans.forEach((span) => {
+    span.addEventListener('click', () => {
+        document.querySelector('.recipe').scrollIntoView();
+    });
+});
+</script>
+
+<style>
+@media (min-width: 0px) {
+:root { --bs-margin: 0px;}
+}
+@media (min-width: 576px) {
+:root { --bs-margin: calc(((100vw - 540px)) / 2);}
+}
+@media (min-width: 768px) {
+:root { --bs-margin: calc(((100vw - 720px)) / 2);}
+}
+@media (min-width: 992px) {
+:root { --bs-margin: calc(((100vw - 960px)) / 2);}
+}
+@media (min-width: 1200px) {
+:root { --bs-margin: calc(((100vw - 1140px)) / 2);}
+}
+@media (min-width: 1400px) {
+:root { --bs-margin: calc(((100vw - 1320px)) / 2);}
+}
+:root {
+    --svg-color: #f8f8f8;
+}
+
+.darkmode {
+    --svg-color: #1e1e1e;
+}
+
+nav {
+    z-index: 10;
+}
+
+#background-error {
+    z-index: -1;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 100vw;
+    max-height: 100vh;
+    transform: translate(-50%, -50%);
+}
+
+.st0 {
+    fill: var(--svg-color);
+}
+
+p {
+    margin-bottom: 0px;
+}
+
+.material-symbols-outlined {
+    font-size: 20pt;
+}
+
+.down {
+    cursor: pointer;
+}
+
+#error h1 {
+    font-size: 80pt;
+}
+
+.apology {
+    font-size: 20pt;
+}
+
+.recipe {
+    text-align: left;
+    padding-top: 20px;
+}
+
+.recipe h1 {
+    text-align: center;
+    font-family: serif;
+    font-size: 45pt;
+}
+
+.recipe h2 {
+    font-family: serif;
+    text-decoration: underline;
+}
+</style>
+{% endblock %}
